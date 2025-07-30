@@ -14,11 +14,9 @@ class Game:
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_UP]:
-            self.car.accelerate()
+            self.car.increase_speed()
         elif keys[pygame.K_DOWN]:
-            self.car.brake()
-        else:
-            self.car.apply_friction()
+            self.car.decrease_speed()
 
         if keys[pygame.K_LEFT]:
             self.car.turn_left()
@@ -30,7 +28,7 @@ class Game:
         self.car.update_position(dt)
 
         if not self.track.is_on_track(self.car.position):
-            self.car.stop()
+            self.car.kill_car()
 
     def render(self):
         self.screen.fill((0, 0, 0))
