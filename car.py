@@ -100,10 +100,9 @@ class Car:
         normalized_rays = [min(d / max_sensor_range, 1.0) for d in ray_distances]
         rad = math.radians(self.angle)
         normalized_angle_vector = [math.cos(rad), math.sin(rad)]
-    
         normalized_speed = (self.speed - self.min_speed) / (self.max_speed - self.min_speed) * 2 - 1
-        
-        return normalized_rays + [normalized_speed, normalized_angle_vector]
+
+        return normalized_rays + [normalized_speed] + normalized_angle_vector
         
     def render_rays(self, screen, track, color=(255, 255, 0)):
         """Debug function to visualize rays (optional)"""
