@@ -9,13 +9,14 @@ class Car:
         self.speed = 0
         self.max_speed = 8
         self.min_speed = -2
-        self.acceleration = 0.2
-        self.turn_rate = 3
+        self.acceleration = 0.02
+        self.turn_rate = 10
         self.width = 25
         self.height = 14
         self.total_distance = 0
         self.last_position = list(start_position)
         self.is_alive = True
+        self.ray_angles = [-90, -45, -22.5, 0, 22.5, 45, 90]
 
     def turn_left(self):
         """Turn left"""
@@ -37,7 +38,7 @@ class Car:
         if self.is_alive:
             self.speed = max(self.speed - self.acceleration, self.min_speed)
 
-    def update_position(self, dt):
+    def update_position(self):
         """Update car position and calculate distance traveled"""
         if not self.is_alive:
             return
@@ -45,8 +46,8 @@ class Car:
         self.last_position = list(self.position)
 
         rad_angle = math.radians(self.angle)
-        self.position[0] += self.speed * math.cos(rad_angle) * dt * 60
-        self.position[1] += self.speed * math.sin(rad_angle) * dt * 60
+        self.position[0] += self.speed * math.cos(rad_angle) * 60
+        self.position[1] += self.speed * math.sin(rad_angle) * 60
 
         dx = self.position[0] - self.last_position[0]
         dy = self.position[1] - self.last_position[1]
@@ -66,6 +67,58 @@ class Car:
         self.total_distance = 0
         self.last_position = list(start_position)
         self.is_alive = True
+        
+    def raycast(self, track, angle_offset=0, max_distance=200):
+        """Cast a ray from car position in given direction and return distance to wall"""
+        if not self.is_alive:
+            return 0
+        
+        ray_angle = math.radians(self.angle + angle_offset)
+        start_x, start_y = self.position
+        step_size = 2
+        distance = 0
+        
+        while distance < max_distance:
+            ray_x = start_x + distance * math.cos(ray_angle)
+            ray_y = start_y + distance * math.sin(ray_angle)
+            
+            if not track.is_on_track((ray_x, ray_y)):
+                return distance
+            
+            distance += step_size
+        
+        return max_distance
+    
+    def get_state(self, track):
+        """Get current state for RL agent - returns normalized sensor readings and car info"""
+        if not self.is_alive:
+            return [0, 0, 0, 0, 0, 0, 0]
+        
+        ray_distances = [self.raycast(track, angle) for angle in self.ray_angles]
+        
+        max_sensor_range = 100
+        normalized_rays = [min(d / max_sensor_range, 1.0) for d in ray_distances]
+        rad = math.radians(self.angle)
+        normalized_angle_vector = [math.cos(rad), math.sin(rad)]
+    
+        normalized_speed = (self.speed - self.min_speed) / (self.max_speed - self.min_speed) * 2 - 1
+        
+        return normalized_rays + [normalized_speed, normalized_angle_vector]
+        
+    def render_rays(self, screen, track, color=(255, 255, 0)):
+        """Debug function to visualize rays (optional)"""
+        if not self.is_alive:
+            return
+    
+        
+        for angle_offset in self.ray_angles:
+            distance = self.raycast(track, angle_offset)
+            ray_angle = math.radians(self.angle + angle_offset)
+            
+            end_x = self.position[0] + distance * math.cos(ray_angle)
+            end_y = self.position[1] + distance * math.sin(ray_angle)
+            
+            pygame.draw.line(screen, color, self.position, (end_x, end_y), 1)
 
     def get_rect(self):
         """Get pygame rect for collision detection"""

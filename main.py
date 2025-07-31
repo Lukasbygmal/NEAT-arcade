@@ -18,16 +18,15 @@ def main():
     running = True
 
     while running:
-        dt = clock.tick(60) / 1000.0  # Might need to lower fps for performance?
-
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 running = False
 
-        game.update(dt)
+        game.handle_input(events)
+        game.update()
         game.render()
-
-    pygame.quit()
+        clock.tick(60)
 
 
 if __name__ == "__main__":
