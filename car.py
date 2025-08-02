@@ -6,13 +6,13 @@ class Car:
     def __init__(self, start_position, start_angle):
         self.position = list(start_position)
         self.angle = start_angle
-        self.speed = 0
-        self.max_speed = 8
-        self.min_speed = -2
+        self.max_speed = 20
+        self.min_speed = 6
+        self.speed = self.min_speed
         self.acceleration = 0.02
         self.turn_rate = 10
-        self.width = 25
-        self.height = 14
+        self.width = 45
+        self.height = 20
         self.total_distance = 0
         self.last_position = list(start_position)
         self.is_alive = True
@@ -42,12 +42,11 @@ class Car:
         """Update car position and calculate distance traveled"""
         if not self.is_alive:
             return
-
         self.last_position = list(self.position)
 
         rad_angle = math.radians(self.angle)
-        self.position[0] += self.speed * math.cos(rad_angle) * 60
-        self.position[1] += self.speed * math.sin(rad_angle) * 60
+        self.position[0] += self.speed * math.cos(rad_angle) #TODO magic number matching fps, ugly
+        self.position[1] += self.speed * math.sin(rad_angle)
 
         dx = self.position[0] - self.last_position[0]
         dy = self.position[1] - self.last_position[1]
@@ -63,10 +62,12 @@ class Car:
         """Reset car to initial state for new RL episode"""
         self.position = list(start_position)
         self.angle = start_angle
-        self.speed = 0
+        self.speed = self.min_speed
         self.total_distance = 0
         self.last_position = list(start_position)
         self.is_alive = True
+        self.current_checkpoint = 0
+        self.checkpoints_passed = 0
         
     def raycast(self, track, angle_offset=0, max_distance=200):
         """Cast a ray from car position in given direction and return distance to wall"""

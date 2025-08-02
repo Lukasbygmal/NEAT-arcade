@@ -117,7 +117,7 @@ class NEATSimulation:
             
             population = neat.Population(config)
             population.add_reporter(neat.StdOutReporter(True))
-            population.run(self.eval_genomes, n=100)
+            population.run(self.eval_genomes, n=50)
             
         except KeyboardInterrupt:
             print("Simulation stopped by user")

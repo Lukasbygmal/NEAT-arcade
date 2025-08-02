@@ -70,12 +70,6 @@ class Environment:
             self.car.turn_left()
         elif action == 4:
             self.car.turn_right()
-        elif action == 5:
-            self.car.increase_speed()
-            self.car.turn_left()
-        elif action == 6:
-            self.car.increase_speed()
-            self.car.turn_right()
 
     def _check_collision(self):
         """Kill the car if any important part is off-track."""
@@ -99,13 +93,23 @@ class Environment:
         if not self.car.is_alive:
             return -200 #TODO magic numbers in function
 
+        total_reward = 0
         delta_distance = self.car.total_distance - self.last_distance
         self.last_distance = self.car.total_distance
         
-        speed_factor = max(0.3, self.car.speed / self.car.max_speed)
-        progress_reward = delta_distance * speed_factor * 10
+        speed_factor = self.car.speed / self.car.max_speed
+        total_reward += delta_distance * speed_factor * 10
+        
+        hit_checkpoint, new_checkpoint_index = self.track.check_checkpoint_collision(
+            self.car.position, self.car.current_checkpoint
+        )
     
-        return progress_reward
+        if hit_checkpoint:
+            total_reward += 5000
+            self.car.current_checkpoint = new_checkpoint_index
+            self.car.checkpoints_passed += 1
+            
+        return total_reward
 
     def _get_state(self):
         """Return current car state."""

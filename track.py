@@ -13,10 +13,21 @@ class Track:
         self.background_color = (55, 125, 34)
         self.start_position = (580, 540)
         self.start_angle = 0
+        
+        self.checkpoints = [
+            (900, 550),
+            (1100, 300),
+            (800, 80),
+            (400, 100),
+        ]
+        self.checkpoint_radius = 50
 
     def draw_track(self, surface):
         """Draw the track surface"""
         surface.blit(self.track_surface, (0, 0))
+        
+        for checkpoint_pos in self.checkpoints:
+            pygame.draw.circle(surface, (255, 215, 0), checkpoint_pos, self.checkpoint_radius, 3)
 
     def is_on_track(self, position):
         """Check if car has crashed returns False if crashed"""
@@ -29,3 +40,18 @@ class Track:
         if pixel_color == self.background_color:
             return False
         return True
+    
+    def check_checkpoint_collision(self, car_position, current_checkpoint_index):
+        """Check if car has reached the next checkpoint"""
+        if current_checkpoint_index >= len(self.checkpoints):
+            return False, current_checkpoint_index
+            
+        checkpoint_pos = self.checkpoints[current_checkpoint_index]
+        distance = ((car_position[0] - checkpoint_pos[0])**2 + 
+                (car_position[1] - checkpoint_pos[1])**2)**0.5
+        
+        if distance <= self.checkpoint_radius:
+            next_checkpoint = (current_checkpoint_index + 1) % len(self.checkpoints)
+            return True, next_checkpoint
+        
+        return False, current_checkpoint_index
