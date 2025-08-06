@@ -1,5 +1,6 @@
 import pygame
 from map_creator import MapCreator
+from simulation import NEATSimulation
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -23,6 +24,16 @@ def main():
                     pygame.image.save(track_surface, "custom_track.png")
                     print(f"Map saved! Start position: {start_pos}")
                     print(f"Checkpoints: {checkpoints}")
+                    
+                    if start_pos is not None:
+                        pygame.quit()  # Close the map creator window
+                        print("Starting NEAT simulation...")
+                        simulation = NEATSimulation(start=start_pos, checkpoints=checkpoints)
+                        simulation.run()
+                        running = False  # Exit the map creator loop
+                    else:
+                        print("Please place a start position before starting simulation!")
+
 
         map_creator.handle_events(events)
 
@@ -30,7 +41,7 @@ def main():
         map_creator.draw()
 
         mode_text = font.render(
-            f"Mode: {map_creator.mode} (1=Track, 2=Off Track, 3=Start, 4=Checkpoint) | Press S to save",
+            f"Mode: {map_creator.mode} (1=Track, 2=Off Track, 3=Start, 4=Checkpoint) | Press S to start simulation",
             True,
             (255, 255, 255),
         )

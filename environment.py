@@ -105,7 +105,7 @@ class Environment:
         )
     
         if hit_checkpoint:
-            total_reward += 5000
+            total_reward += 15000
             self.car.current_checkpoint = new_checkpoint_index
             self.car.checkpoints_passed += 1
             

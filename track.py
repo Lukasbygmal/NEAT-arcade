@@ -3,23 +3,17 @@ import math
 
 
 class Track:
-    def __init__(self, width, height):
-        self.track_image = pygame.image.load("track_1.png").convert()
+    def __init__(self, width, height, start, checkpoints):
+        self.track_image = pygame.image.load("custom_track.png").convert()
         self.track_image = pygame.transform.scale(self.track_image, (width, height))
         self.track_surface = self.track_image.copy()
         self.width = width
         self.height = height
 
         self.background_color = (55, 125, 34)
-        self.start_position = (580, 540)
+        self.start_position = start
         self.start_angle = 0
-        
-        self.checkpoints = [
-            (900, 550),
-            (1100, 300),
-            (800, 80),
-            (400, 100),
-        ]
+        self.checkpoints = checkpoints
         self.checkpoint_radius = 50
 
     def draw_track(self, surface):

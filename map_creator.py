@@ -123,7 +123,6 @@ class MapCreator:
     def _add_corner_smoothing(self, surface: pygame.Surface) -> None:
         """Add triangular smoothing to inner corners of L-shaped tracks."""
         corner_configs = [
-            # (dr1, dc1, dr2, dc2, point_offsets)
             (-1, 0, 0, -1, [(0, 0), (1, 0), (0, 1)]),      # Top-left L
             (-1, 0, 0, 1, [(1, 0), (0, 0), (1, 1)]),       # Top-right L  
             (1, 0, 0, -1, [(0, 1), (0, 0), (1, 1)]),       # Bottom-left L
@@ -151,10 +150,8 @@ class MapCreator:
                 pygame.draw.rect(self.screen, Colors.GRID_LINE, rect, 1)
 
     def get_map_data(self) -> Tuple[pygame.Surface, Optional[Tuple[int, int]], List[Tuple[int, int]]]:
-        """Generate final map surface and position data."""
+        """Generate final map surface and position data, convert start and checkpoints to track"""
         surface = pygame.Surface((self.width, self.height))
-
-        # Draw base grid (convert special colors to track)
         for row in range(self.rows):
             for col in range(self.cols):
                 color = self.grid[row][col]

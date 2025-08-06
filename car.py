@@ -7,7 +7,7 @@ class Car:
         self.position = list(start_position)
         self.angle = start_angle
         self.max_speed = 20
-        self.min_speed = 6
+        self.min_speed = 2
         self.speed = self.min_speed
         self.acceleration = 0.02
         self.turn_rate = 10

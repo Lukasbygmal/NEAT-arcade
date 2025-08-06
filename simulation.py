@@ -10,7 +10,7 @@ class NEATSimulation:
     All cars drive simultaneously and are always rendered.
     """
     
-    def __init__(self, config_path="config-feedforward.txt"):
+    def __init__(self, config_path="config-feedforward.txt", start=None, checkpoints=None):
         self.config_path = config_path
         self.generation = 0
         self.track = None
@@ -20,6 +20,8 @@ class NEATSimulation:
         pygame.display.set_caption("NEAT Racing")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
+        self.start = start
+        self.checkpoints = checkpoints
         
     def eval_genomes(self, genomes, config):
         """
@@ -29,7 +31,7 @@ class NEATSimulation:
         print(f"Generation {self.generation}")
         
         if self.track is None:
-            self.track = Track(Environment.SCREEN_WIDTH, Environment.SCREEN_HEIGHT)
+            self.track = Track(Environment.SCREEN_WIDTH, Environment.SCREEN_HEIGHT, self.start, self.checkpoints)
         
         cars_data = []
         for genome_id, genome in genomes:
