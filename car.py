@@ -16,7 +16,7 @@ class Car:
         self.total_distance = 0
         self.last_position = list(start_position)
         self.is_alive = True
-        self.ray_angles = [-90, -45, -22.5, 0, 22.5, 45, 90]
+        self.ray_angles = [-75, -35, 0, 35, 75]
 
     def turn_left(self):
         """Turn left"""
@@ -92,8 +92,8 @@ class Car:
     
     def get_state(self, track):
         """Get current state for RL agent - returns normalized sensor readings and car info"""
-        if not self.is_alive:
-            return [0, 0, 0, 0, 0, 0, 0]
+        if not self.is_alive: #TODO DO I NEED THIS??
+            return [0, 0, 0, 0, 0]
         
         ray_distances = [self.raycast(track, angle) for angle in self.ray_angles]
         

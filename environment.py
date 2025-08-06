@@ -76,16 +76,7 @@ class Environment:
         if not self.car.is_alive:
             return
 
-        car_rect = self.car.get_rect()
-        critical_points = [
-            (car_rect.left, car_rect.top),
-            (car_rect.right, car_rect.top),
-            (car_rect.left, car_rect.bottom),
-            (car_rect.right, car_rect.bottom),
-            (car_rect.centerx, car_rect.centery),
-        ]
-
-        if any(not self.track.is_on_track(p) for p in critical_points):
+        if not self.track.is_on_track(self.car.position):
             self.car.kill_car()
 
     def _calculate_reward(self):
