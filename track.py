@@ -4,7 +4,7 @@ import math
 
 class Track:
     def __init__(self, width, height, start, checkpoints):
-        self.track_image = pygame.image.load("custom_track.png").convert()
+        self.track_image = pygame.image.load("track.png").convert()
         self.track_image = pygame.transform.scale(self.track_image, (width, height))
         self.track_surface = self.track_image.copy()
         self.width = width

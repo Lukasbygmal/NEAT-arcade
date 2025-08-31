@@ -17,6 +17,8 @@ class Car:
         self.last_position = list(start_position)
         self.is_alive = True
         self.ray_angles = [-75, -35, 0, 35, 75]
+        self.car_image = pygame.image.load("car.png").convert_alpha()
+        self.car_image = pygame.transform.scale(self.car_image, (self.width, self.height))
 
     def turn_left(self):
         """Turn left"""
@@ -128,12 +130,18 @@ class Car:
             self.width,
             self.height,
         )
-
+    
     def render(self, screen):
         """Render the car on screen"""
-        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        color = (255, 128, 0) if self.is_alive else (200, 0, 0)
-        surface.fill(color)
+        # Use the loaded image instead of creating a surface
+        surface = self.car_image.copy()
+        
+        # Apply red tint if car is dead
+        if not self.is_alive:
+            red_tint = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+            red_tint.fill((255, 0, 0, 128))  # Red with 50% alpha
+            surface.blit(red_tint, (0, 0))
+        
         rotated_surface = pygame.transform.rotate(surface, -self.angle)
         rect = rotated_surface.get_rect(center=(self.position[0], self.position[1]))
         screen.blit(rotated_surface, rect.topleft)

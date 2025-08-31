@@ -21,16 +21,16 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     track_surface, start_pos, checkpoints = map_creator.get_map_data()
-                    pygame.image.save(track_surface, "custom_track.png")
+                    pygame.image.save(track_surface, "track.png")
                     print(f"Map saved! Start position: {start_pos}")
                     print(f"Checkpoints: {checkpoints}")
                     
                     if start_pos is not None:
-                        pygame.quit()  # Close the map creator window
+                        pygame.quit()
                         print("Starting NEAT simulation...")
                         simulation = NEATSimulation(start=start_pos, checkpoints=checkpoints)
                         simulation.run()
-                        running = False  # Exit the map creator loop
+                        running = False
                     else:
                         print("Please place a start position before starting simulation!")
 
