@@ -20,8 +20,11 @@ class Track:
         """Draw the track surface"""
         surface.blit(self.track_surface, (0, 0))
         
-        for checkpoint_pos in self.checkpoints:
+        for i, checkpoint_pos in enumerate(self.checkpoints):
             pygame.draw.circle(surface, (255, 215, 0), checkpoint_pos, self.checkpoint_radius, 3)
+            font = pygame.font.Font(None, 24)
+            text = font.render(str(i+1), True, (255, 215, 0))
+            surface.blit(text, (checkpoint_pos[0]-10, checkpoint_pos[1]-10))
 
     def is_on_track(self, position):
         """Check if car has crashed returns False if crashed"""

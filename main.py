@@ -26,9 +26,8 @@ def main():
                     print(f"Checkpoints: {checkpoints}")
                     
                     if start_pos is not None:
-                        pygame.quit()
                         print("Starting NEAT simulation...")
-                        simulation = NEATSimulation(start=start_pos, checkpoints=checkpoints)
+                        simulation = NEATSimulation(start=start_pos, checkpoints=checkpoints, screen=screen)
                         simulation.run()
                         running = False
                     else:
