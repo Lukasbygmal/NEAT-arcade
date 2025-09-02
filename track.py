@@ -16,7 +16,7 @@ class Track:
         self.checkpoints = checkpoints
         self.checkpoint_radius = 50
 
-    def draw_track(self, surface):
+    def draw(self, surface):
         """Draw the track surface"""
         surface.blit(self.track_surface, (0, 0))
         

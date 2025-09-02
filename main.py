@@ -1,6 +1,8 @@
 import pygame
-from map_creator import MapCreator
+from race_map_creator import RaceMapCreator
 from simulation import NEATSimulation
+from race_environment import RaceEnvironment
+from track import Track
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -10,7 +12,7 @@ font = pygame.font.SysFont(None, 44)
 
 
 def main():
-    map_creator = MapCreator(screen)
+    map_creator = RaceMapCreator(screen)
     running = True
 
     while running:
@@ -24,15 +26,23 @@ def main():
                     pygame.image.save(track_surface, "track.png")
                     print(f"Map saved! Start position: {start_pos}")
                     print(f"Checkpoints: {checkpoints}")
-                    
+
                     if start_pos is not None:
                         print("Starting NEAT simulation...")
-                        simulation = NEATSimulation(start=start_pos, checkpoints=checkpoints, screen=screen)
+                        simulation = NEATSimulation(
+                            start=start_pos,
+                            checkpoints=checkpoints,
+                            screen=screen,
+                            environment_class=RaceEnvironment,
+                            world_class=Track,
+                            max_steps=1200,
+                        )
                         simulation.run()
                         running = False
                     else:
-                        print("Please place a start position before starting simulation!")
-
+                        print(
+                            "Please place a start position before starting simulation!"
+                        )
 
         map_creator.handle_events(events)
 

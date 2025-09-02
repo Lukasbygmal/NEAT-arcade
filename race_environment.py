@@ -4,7 +4,7 @@ from track import Track
 from car import Car
 
 
-class Environment:
+class RaceEnvironment:
     """
     Reinforcement learning environment for a racing car simulation.
     Provides control, physics, collision, reward logic, and rendering.

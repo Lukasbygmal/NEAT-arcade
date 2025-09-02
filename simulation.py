@@ -1,8 +1,6 @@
 import neat
 import pygame
 import numpy as np
-from environment import Environment
-from track import Track
 
 class NEATSimulation:
     """
@@ -10,18 +8,22 @@ class NEATSimulation:
     All cars drive simultaneously and are always rendered.
     """
     
-    def __init__(self, config_path="config-feedforward.txt", start=None, checkpoints=None, screen=None):
+    def __init__(self, start, checkpoints, screen, environment_class, world_class, max_steps, config_path="config-feedforward.txt"):
         self.config_path = config_path
         self.generation = 0
-        self.track = None
+        self.world = None
         
         pygame.init()
-        self.screen = pygame.display.set_mode((Environment.SCREEN_WIDTH, Environment.SCREEN_HEIGHT))
         pygame.display.set_caption("NEAT Racing")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         self.start = start
         self.checkpoints = checkpoints
+        
+        self.max_steps = max_steps
+        self.environment_class = environment_class
+        self.world_class = world_class
+
         self.screen = screen
         
     def eval_genomes(self, genomes, config):
@@ -31,13 +33,15 @@ class NEATSimulation:
         self.generation += 1
         print(f"Generation {self.generation}")
         
-        if self.track is None:
-            self.track = Track(Environment.SCREEN_WIDTH, Environment.SCREEN_HEIGHT, self.start, self.checkpoints)
+        if self.world is None:
+            screen_width = self.screen.get_width()
+            screen_height = self.screen.get_height()
+            self.world = self.world_class(screen_width, screen_height, self.start, self.checkpoints)
         
         cars_data = []
         for genome_id, genome in genomes:
             net = neat.nn.FeedForwardNetwork.create(genome, config)
-            env = Environment(self.track)
+            env = self.environment_class(self.world)
             env.reset()
             cars_data.append({
                 'genome_id': genome_id,
@@ -50,7 +54,7 @@ class NEATSimulation:
         step = 0
         running = True
         
-        while running and step < Environment.MAX_STEPS:
+        while running and step < self.max_steps:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -88,7 +92,7 @@ class NEATSimulation:
         Render all cars
         """
         self.screen.fill((0, 0, 0))
-        self.track.draw_track(self.screen)
+        self.world.draw(self.screen)
         
         for car_data in cars_data:
             car_data['env'].car.render(self.screen)
@@ -99,7 +103,7 @@ class NEATSimulation:
         alive_text = self.font.render(f"Cars Alive: {alive_count}/{len(cars_data)}", True, (255, 255, 255))
         self.screen.blit(alive_text, (10, 50))
         
-        step_text = self.font.render(f"Step: {step}/{Environment.MAX_STEPS}", True, (255, 255, 255))
+        step_text = self.font.render(f"Step: {step}/{self.max_steps}", True, (255, 255, 255))
         self.screen.blit(step_text, (10, 90))
         
         if cars_data:

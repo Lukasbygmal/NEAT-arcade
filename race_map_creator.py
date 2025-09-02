@@ -18,7 +18,7 @@ class Colors:
     GRID_LINE = (0, 0, 0)
 
 
-class MapCreator:
+class RaceMapCreator:
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
         self.width = 1200
