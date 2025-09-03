@@ -2,9 +2,10 @@ import numpy as np
 import pygame
 from track import Track
 from car import Car
+from environment import Environment
 
 
-class RaceEnvironment:
+class RaceEnvironment(Environment):
     """
     Reinforcement learning environment for a racing car simulation.
     Provides control, physics, collision, reward logic, and rendering.
@@ -109,3 +110,11 @@ class RaceEnvironment:
     def _is_done(self):
         """Episode ends on death or max steps."""
         return not self.car.is_alive or self.current_step >= self.MAX_STEPS
+    
+    def is_alive(self):
+        """Check if car is still alive."""
+        return self.car.is_alive
+    
+    def render_entity(self, screen):
+        """Render the car on screen."""
+        self.car.render(screen)
