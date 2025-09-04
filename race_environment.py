@@ -11,12 +11,12 @@ class RaceEnvironment(Environment):
     Provides control, physics, collision, reward logic, and rendering.
     """
 
-    SCREEN_WIDTH = 1200 #TODO this should probably be moved up to simulation
+    SCREEN_WIDTH = 1200  # TODO this should probably be moved up to simulation
     SCREEN_HEIGHT = 800
     MAX_STEPS = 1200
 
     def __init__(self, track):
-        
+
         self.track = track
         self.car = Car(self.track.start_position, self.track.start_angle)
 
@@ -83,24 +83,24 @@ class RaceEnvironment(Environment):
     def _calculate_reward(self):
         """Reward for distance progress and staying alive."""
         if not self.car.is_alive:
-            return -200 #TODO magic numbers in function
+            return -200  # TODO magic numbers in function
 
         total_reward = 0
         delta_distance = self.car.total_distance - self.last_distance
         self.last_distance = self.car.total_distance
-        
+
         speed_factor = self.car.speed / self.car.max_speed
         total_reward += delta_distance * speed_factor * 10
-        
+
         hit_checkpoint, new_checkpoint_index = self.track.check_checkpoint_collision(
             self.car.position, self.car.current_checkpoint
         )
-    
+
         if hit_checkpoint:
             total_reward += 15000
             self.car.current_checkpoint = new_checkpoint_index
             self.car.checkpoints_passed += 1
-            
+
         return total_reward
 
     def _get_state(self):
@@ -110,11 +110,11 @@ class RaceEnvironment(Environment):
     def _is_done(self):
         """Episode ends on death or max steps."""
         return not self.car.is_alive or self.current_step >= self.MAX_STEPS
-    
+
     def is_alive(self):
         """Check if car is still alive."""
         return self.car.is_alive
-    
+
     def render_entity(self, screen):
         """Render the car on screen."""
         self.car.render(screen)

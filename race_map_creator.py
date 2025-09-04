@@ -27,7 +27,9 @@ class RaceMapCreator:
         self.cols = self.width // self.grid_size
         self.rows = self.height // self.grid_size
 
-        self.grid = [[Colors.OFF_TRACK for _ in range(self.cols)] for _ in range(self.rows)]
+        self.grid = [
+            [Colors.OFF_TRACK for _ in range(self.cols)] for _ in range(self.rows)
+        ]
         self.start_pos: Optional[Tuple[int, int]] = None
         self.gold_positions: List[Tuple[int, int]] = []
         self.mode = EditMode.TRACK
@@ -60,8 +62,10 @@ class RaceMapCreator:
 
     def _grid_to_center_pos(self, col: int, row: int) -> Tuple[int, int]:
         """Convert grid coordinates to center pixel position."""
-        return (col * self.grid_size + self.grid_size // 2, 
-                row * self.grid_size + self.grid_size // 2)
+        return (
+            col * self.grid_size + self.grid_size // 2,
+            row * self.grid_size + self.grid_size // 2,
+        )
 
     def _clear_position_from_special_lists(self, col: int, row: int) -> None:
         """Remove position from start_pos and gold_positions if present."""
@@ -74,24 +78,24 @@ class RaceMapCreator:
         grid_pos = self._pos_to_grid(pos)
         if not grid_pos:
             return
-            
+
         col, row = grid_pos
-        
+
         if self.mode == EditMode.TRACK:
             self.grid[row][col] = Colors.TRACK
             self._clear_position_from_special_lists(col, row)
-            
+
         elif self.mode == EditMode.OFF_TRACK:
             self.grid[row][col] = Colors.OFF_TRACK
             self._clear_position_from_special_lists(col, row)
-            
+
         elif self.mode == EditMode.START:
             self._clear_old_start_position()
             self.start_pos = (col, row)
             self.grid[row][col] = Colors.START
             if (col, row) in self.gold_positions:
                 self.gold_positions.remove((col, row))
-                
+
         elif self.mode == EditMode.CHECKPOINT:
             if (col, row) not in self.gold_positions:
                 self.gold_positions.append((col, row))
@@ -112,44 +116,63 @@ class RaceMapCreator:
             return False
         return self.grid[row][col] == Colors.TRACK
 
-    def _draw_corner_triangle(self, surface: pygame.Surface, row: int, col: int, 
-                            dr1: int, dc1: int, dr2: int, dc2: int, 
-                            triangle_points: List[Tuple[int, int]]) -> None:
+    def _draw_corner_triangle(
+        self,
+        surface: pygame.Surface,
+        row: int,
+        col: int,
+        dr1: int,
+        dc1: int,
+        dr2: int,
+        dc2: int,
+        triangle_points: List[Tuple[int, int]],
+    ) -> None:
         """Draw corner smoothing triangle if L-corner is detected."""
-        if (self._is_track_edge(row + dr1, col + dc1) and 
-            self._is_track_edge(row + dr2, col + dc2)):
+        if self._is_track_edge(row + dr1, col + dc1) and self._is_track_edge(
+            row + dr2, col + dc2
+        ):
             pygame.draw.polygon(surface, Colors.TRACK, triangle_points)
 
     def _add_corner_smoothing(self, surface: pygame.Surface) -> None:
         """Add triangular smoothing to inner corners of L-shaped tracks."""
         corner_configs = [
-            (-1, 0, 0, -1, [(0, 0), (1, 0), (0, 1)]),      # Top-left L
-            (-1, 0, 0, 1, [(1, 0), (0, 0), (1, 1)]),       # Top-right L  
-            (1, 0, 0, -1, [(0, 1), (0, 0), (1, 1)]),       # Bottom-left L
-            (1, 0, 0, 1, [(1, 1), (0, 1), (1, 0)])         # Bottom-right L
+            (-1, 0, 0, -1, [(0, 0), (1, 0), (0, 1)]),  # Top-left L
+            (-1, 0, 0, 1, [(1, 0), (0, 0), (1, 1)]),  # Top-right L
+            (1, 0, 0, -1, [(0, 1), (0, 0), (1, 1)]),  # Bottom-left L
+            (1, 0, 0, 1, [(1, 1), (0, 1), (1, 0)]),  # Bottom-right L
         ]
-        
+
         for row in range(self.rows):
             for col in range(self.cols):
                 if not self._is_track_edge(row, col):
                     x, y = col * self.grid_size, row * self.grid_size
-                    
+
                     for dr1, dc1, dr2, dc2, offsets in corner_configs:
-                        triangle_points = [(x + ox * self.grid_size, y + oy * self.grid_size) 
-                                         for ox, oy in offsets]
-                        self._draw_corner_triangle(surface, row, col, dr1, dc1, dr2, dc2, triangle_points)
+                        triangle_points = [
+                            (x + ox * self.grid_size, y + oy * self.grid_size)
+                            for ox, oy in offsets
+                        ]
+                        self._draw_corner_triangle(
+                            surface, row, col, dr1, dc1, dr2, dc2, triangle_points
+                        )
 
     def draw(self) -> None:
         """Draw the current grid state to the screen."""
         for row in range(self.rows):
             for col in range(self.cols):
                 color = self.grid[row][col]
-                rect = pygame.Rect(col * self.grid_size, row * self.grid_size, 
-                                 self.grid_size, self.grid_size)
+                rect = pygame.Rect(
+                    col * self.grid_size,
+                    row * self.grid_size,
+                    self.grid_size,
+                    self.grid_size,
+                )
                 pygame.draw.rect(self.screen, color, rect)
                 pygame.draw.rect(self.screen, Colors.GRID_LINE, rect, 1)
 
-    def get_map_data(self) -> Tuple[pygame.Surface, Optional[Tuple[int, int]], List[Tuple[int, int]]]:
+    def get_map_data(
+        self,
+    ) -> Tuple[pygame.Surface, Optional[Tuple[int, int]], List[Tuple[int, int]]]:
         """Generate final map surface and position data, convert start and checkpoints to track"""
         surface = pygame.Surface((self.width, self.height))
         for row in range(self.rows):
@@ -157,9 +180,13 @@ class RaceMapCreator:
                 color = self.grid[row][col]
                 if color in (Colors.START, Colors.CHECKPOINT):
                     color = Colors.TRACK
-                    
-                rect = pygame.Rect(col * self.grid_size, row * self.grid_size, 
-                                 self.grid_size, self.grid_size)
+
+                rect = pygame.Rect(
+                    col * self.grid_size,
+                    row * self.grid_size,
+                    self.grid_size,
+                    self.grid_size,
+                )
                 pygame.draw.rect(surface, color, rect)
 
         self._add_corner_smoothing(surface)
@@ -168,6 +195,8 @@ class RaceMapCreator:
         if self.start_pos:
             start_position = self._grid_to_center_pos(*self.start_pos)
 
-        checkpoints = [self._grid_to_center_pos(col, row) for col, row in self.gold_positions]
+        checkpoints = [
+            self._grid_to_center_pos(col, row) for col, row in self.gold_positions
+        ]
 
         return surface, start_position, checkpoints
